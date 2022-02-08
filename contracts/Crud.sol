@@ -7,6 +7,7 @@ contract Crud {
     using EnumerableSet for EnumerableSet.AddressSet;
 
     mapping(address => Post[]) public addressPostsMap;
+    uint private postIdCounter;
     EnumerableSet.AddressSet private addresses;
 
     struct Post {
@@ -15,12 +16,16 @@ contract Crud {
         string content;
     }
 
+    error PostIdNotFound();
+
     function create(string memory content) external {
         Post[] storage postsForAddress = addressPostsMap[msg.sender];
-        uint nextId = getNextId(postsForAddress);
+        uint nextId = postIdCounter;
         Post memory post = Post(nextId, msg.sender, content);
+
         addresses.add(msg.sender);
         postsForAddress.push(post);
+        postIdCounter += 1;
     }
 
     function getAllPosts() public view returns (Post[] memory) {
@@ -38,11 +43,19 @@ contract Crud {
         return allPosts;
     }
 
-    function getNextId(Post[] storage posts) internal view returns (uint) {
-        if (posts.length == 0) {
-            return 0;
+    function update(uint postId, string memory newContent) external {
+        Post[] storage postsForAddress = addressPostsMap[msg.sender];
+        uint postIndex = getPostIndex(postId, postsForAddress);
+        postsForAddress[postIndex].content = newContent;
+    }
+
+    function getPostIndex(uint postId, Post[] storage posts) internal view returns (uint) {
+        for (uint i=0; i< posts.length; i++) {
+            if(posts[i].id == postId) {
+                return i;
+            }
         }
-        return posts[posts.length - 1].id + 1;
+        revert PostIdNotFound();
     }
 
     function getAllPostsCount() internal view returns (uint) {
