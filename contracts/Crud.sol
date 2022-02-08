@@ -10,14 +10,16 @@ contract Crud {
     EnumerableSet.AddressSet private addresses;
 
     struct Post {
+        uint id;
         address createdBy;
         string content;
     }
 
     function create(string memory content) external {
-        Post memory post = Post(msg.sender, content);
-        addresses.add(msg.sender);
         Post[] storage postsForAddress = addressPostsMap[msg.sender];
+        uint nextId = getNextId(postsForAddress);
+        Post memory post = Post(nextId, msg.sender, content);
+        addresses.add(msg.sender);
         postsForAddress.push(post);
     }
 
@@ -34,6 +36,13 @@ contract Crud {
             }
         }
         return allPosts;
+    }
+
+    function getNextId(Post[] storage posts) internal view returns (uint) {
+        if (posts.length == 0) {
+            return 0;
+        }
+        return posts[posts.length - 1].id + 1;
     }
 
     function getAllPostsCount() internal view returns (uint) {
