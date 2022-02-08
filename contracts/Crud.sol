@@ -49,9 +49,16 @@ contract Crud {
         postsForAddress[postIndex].content = newContent;
     }
 
+    function deletePost(uint postId) external {
+        Post[] storage postsForAddress = addressPostsMap[msg.sender];
+        uint postIndex = getPostIndex(postId, postsForAddress);
+        postsForAddress[postIndex] = postsForAddress[postsForAddress.length - 1];
+        postsForAddress.pop();
+    }
+
     function getPostIndex(uint postId, Post[] storage posts) internal view returns (uint) {
-        for (uint i=0; i< posts.length; i++) {
-            if(posts[i].id == postId) {
+        for (uint i = 0; i < posts.length; i++) {
+            if (posts[i].id == postId) {
                 return i;
             }
         }
