@@ -10,7 +10,7 @@ test:
 	npx hardhat test
 
 deploy:
-	npx hardhat run scripts/sample-script.js --network localhost
+	npx hardhat run scripts/deploy-crud.script.js --network localhost
 
 node:
 	npx hardhat node
