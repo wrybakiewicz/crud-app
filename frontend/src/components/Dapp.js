@@ -6,6 +6,8 @@ import contractAddress from "../contracts/contract-address.json";
 import {ethers} from "ethers";
 import {WaitingForTransactionMessage} from "./WaitingForTransactionMessage";
 import {TransactionErrorMessage} from "./TransactionErrorMessage";
+import {AllPosts} from "./AllPosts";
+import {CreatePost} from "./CreatePost";
 
 const HARDHAT_NETWORK_ID = '31337';
 
@@ -19,6 +21,7 @@ export class Dapp extends React.Component {
             networkError: undefined,
             txBeingSent: undefined,
             transactionError: undefined,
+            crud: undefined
         };
 
         this.state = this.initialState;
@@ -49,6 +52,10 @@ export class Dapp extends React.Component {
             );
         }
 
+        if (!this.state.crud) {
+            return <div>Loading...</div>
+        }
+
         return <div>
             <h2>Welcome: {this.state.selectedAddress}</h2>
             <div>
@@ -61,6 +68,10 @@ export class Dapp extends React.Component {
                         dismiss={() => this._dismissTransactionError()}
                     />
                 )}
+            </div>
+            <div>
+                <CreatePost crud={this.state.crud}/>
+                <AllPosts crud={this.state.crud} selectedAddress={this.state.selectedAddress} />
             </div>
         </div>;
     }
@@ -126,11 +137,12 @@ export class Dapp extends React.Component {
 
         // When, we initialize the contract using that provider and the token's
         // artifact. You can do this same thing with your contracts.
-        this._crud = new ethers.Contract(
+        const crud = new ethers.Contract(
             contractAddress.Crud,
             CrudArtifact.abi,
             this._provider.getSigner(0)
         );
+        this.setState({crud: crud})
     }
 
     _checkNetwork() {
