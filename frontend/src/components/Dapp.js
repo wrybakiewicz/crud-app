@@ -21,7 +21,8 @@ export class Dapp extends React.Component {
             networkError: undefined,
             txBeingSent: undefined,
             transactionError: undefined,
-            crud: undefined
+            crud: undefined,
+            refreshPosts: undefined
         };
 
         this.state = this.initialState;
@@ -31,11 +32,6 @@ export class Dapp extends React.Component {
         this._connectWallet();
     }
 
-    componentWillUnmount() {
-        // We poll the user's balance, so we have to stop doing that when Dapp
-        // gets unmounted
-        this._stopPollingData();
-    }
 
     render() {
         if (window.ethereum === undefined) {
@@ -70,8 +66,8 @@ export class Dapp extends React.Component {
                 )}
             </div>
             <div>
-                <CreatePost crud={this.state.crud}/>
-                <AllPosts crud={this.state.crud} selectedAddress={this.state.selectedAddress} />
+                <CreatePost crud={this.state.crud} refreshPosts={() => this.setState({refreshPosts: true})}/>
+                <AllPosts crud={this.state.crud} selectedAddress={this.state.selectedAddress} refreshPosts={this.state.refreshPosts}/>
             </div>
         </div>;
     }
@@ -109,9 +105,12 @@ export class Dapp extends React.Component {
 
         // We reset the dapp state if the network is changed
         window.ethereum.on("networkChanged", ([networkId]) => {
-            this._stopPollingData();
             this._resetState();
         });
+    }
+
+    _resetState() {
+        this.setState(this.initialState);
     }
 
     _initialize(userAddress) {
@@ -128,7 +127,6 @@ export class Dapp extends React.Component {
         // Fetching the token data and the user's balance are specific to this
         // sample project, but you can reuse the same initialization pattern.
         this._intializeEthers();
-        this._startPollingData();
     }
 
     async _intializeEthers() {
@@ -161,18 +159,6 @@ export class Dapp extends React.Component {
         this.setState({ networkError: undefined });
     }
 
-    _startPollingData() {
-        this._pollDataInterval = setInterval(() => {
-
-        }, 1000);
-
-        // We run it once immediately so we don't have to wait for it
-    }
-
-    _stopPollingData() {
-        clearInterval(this._pollDataInterval);
-        this._pollDataInterval = undefined;
-    }
 
     _getRpcErrorMessage(error) {
         if (error.data) {

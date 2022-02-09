@@ -21,9 +21,10 @@ export class CreatePost extends React.Component {
 
     async createPost() {
         const content = this.state.content;
-        const {crud} = this.props;
+        const {crud, refreshPosts} = this.props;
         const tx = await crud.create(content);
         const result = tx.wait();
+        refreshPosts();
     }
 
 }

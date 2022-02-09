@@ -9,14 +9,16 @@ export class AllPosts extends React.Component {
         this.getAllPosts();
     }
 
-    componentWillUnmount() {
-
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        if(this.props.refreshPosts || this.state.refreshPosts) {
+            this.getAllPosts();
+        }
     }
 
     render() {
         return <div>
             <h2>All posts:</h2>
-            {this.state.posts.map((post, index) => <Post post={post} key={index} selectedAddress={this.props.selectedAddress} crud={this.props.crud} />)}
+            {this.state.posts.map((post, index) => <Post post={post} key={index} selectedAddress={this.props.selectedAddress} crud={this.props.crud} refreshPosts={() => this.setState({refreshPosts: true})}/>)}
         </div>
     }
 

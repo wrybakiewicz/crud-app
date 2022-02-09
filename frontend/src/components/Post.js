@@ -20,12 +20,14 @@ export default class Post extends React.Component {
         const {crud} = this.props;
         const tx = await crud.deletePost(this.props.post.id);
         const result = tx.wait();
+        this.props.refreshPosts();
     }
 
     async update() {
         const {crud} = this.props;
         const tx = await crud.update(this.props.post.id, this.state.newContent);
         const result = tx.wait();
+        this.props.refreshPosts();
     }
 
     isCreatedByCurrentAddress(post) {
