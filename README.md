@@ -5,3 +5,4 @@ A CRUD (Create, Read, Update, Delete) dApp where users can create posts, read po
 ## How to run
 - `make node`
 - `make compile deploy`
+- from ./client `npm install` `npm start`
