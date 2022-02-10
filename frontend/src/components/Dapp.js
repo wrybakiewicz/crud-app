@@ -4,8 +4,6 @@ import {ConnectWallet} from "./ConnectWallet";
 import CrudArtifact from "../contracts/Crud.json";
 import contractAddress from "../contracts/contract-address.json";
 import {ethers} from "ethers";
-import {WaitingForTransactionMessage} from "./WaitingForTransactionMessage";
-import {TransactionErrorMessage} from "./TransactionErrorMessage";
 import {AllPosts} from "./AllPosts";
 import {CreatePost} from "./CreatePost";
 
@@ -19,8 +17,6 @@ export class Dapp extends React.Component {
         this.initialState = {
             selectedAddress: undefined,
             networkError: undefined,
-            txBeingSent: undefined,
-            transactionError: undefined,
             crud: undefined,
             refreshPosts: undefined
         };
@@ -54,17 +50,6 @@ export class Dapp extends React.Component {
 
         return <div>
             <h2>Welcome: {this.state.selectedAddress}</h2>
-            <div>
-                {this.state.txBeingSent && (
-                    <WaitingForTransactionMessage txHash={this.state.txBeingSent} />
-                )}
-                {this.state.transactionError && (
-                    <TransactionErrorMessage
-                        message={this._getRpcErrorMessage(this.state.transactionError)}
-                        dismiss={() => this._dismissTransactionError()}
-                    />
-                )}
-            </div>
             <div>
                 <CreatePost crud={this.state.crud} refreshPosts={() => this.setState({refreshPosts: true})}/>
                 <AllPosts crud={this.state.crud} selectedAddress={this.state.selectedAddress} refreshPosts={this.state.refreshPosts}/>
@@ -157,19 +142,6 @@ export class Dapp extends React.Component {
 
     _dismissNetworkError() {
         this.setState({ networkError: undefined });
-    }
-
-
-    _getRpcErrorMessage(error) {
-        if (error.data) {
-            return error.data.message;
-        }
-
-        return error.message;
-    }
-
-    _dismissTransactionError() {
-        this.setState({ transactionError: undefined });
     }
 
 }
